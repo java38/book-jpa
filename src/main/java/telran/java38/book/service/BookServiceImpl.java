@@ -82,23 +82,31 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
 		Author author = authorRepository.findById(authorName).orElseThrow(DocumentNotFoundException::new);
-		bookRepository.deleteByAuthorName(authorName);
+		//bookRepository.deleteByAuthorName(authorName);
 		authorRepository.delete(author);
 		return modelMapper.map(author, AuthorDto.class);
 	}
 
 	@Override
 	public Iterable<BookDto> findBooksByAuthor(String authorName) {
-		List<Book> books = bookRepository.findBooksByAuthor(authorName);
-		return books.stream()
+//		List<Book> books = bookRepository.findBooksByAuthor(authorName);
+//		return books.stream()
+//				.map(b -> modelMapper.map(b, BookDto.class))
+//				.collect(Collectors.toList());
+		Author author = authorRepository.findById(authorName).orElseThrow(DocumentNotFoundException::new);
+		return author.getBooks().stream()
 				.map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Iterable<BookDto> findBooksByPublisher(String publisherName) {
-		List<Book> books = bookRepository.findBooksByPublisher(publisherName);
-		return books.stream()
+//		List<Book> books = bookRepository.findBooksByPublisher(publisherName);
+//		return books.stream()
+//				.map(b -> modelMapper.map(b, BookDto.class))
+//				.collect(Collectors.toList());
+		Publisher publisher = publisherRepository.findById(publisherName).orElseThrow(DocumentNotFoundException::new);
+		return publisher.getBooks().stream()
 				.map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
