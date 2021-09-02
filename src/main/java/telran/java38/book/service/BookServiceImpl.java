@@ -1,5 +1,6 @@
 package telran.java38.book.service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,45 +63,60 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public BookDto removeBook(String isbn) {
-		// TODO Auto-generated method stub
-		return null;
+		Book book = bookRepository.findById(isbn).orElseThrow(DocumentNotFoundException::new);
+		bookRepository.delete(book);
+		return modelMapper.map(book, BookDto.class);
 	}
 
 	@Override
+	@Transactional
 	public BookDto updateBook(String isbn, String title) {
-		// TODO Auto-generated method stub
-		return null;
+		Book book = bookRepository.findById(isbn).orElseThrow(DocumentNotFoundException::new);
+		book.setTitle(title);
+		return modelMapper.map(book, BookDto.class);
 	}
 
 	@Override
+	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		Author author = authorRepository.findById(authorName).orElseThrow(DocumentNotFoundException::new);
+		bookRepository.deleteByAuthorName(authorName);
+		authorRepository.delete(author);
+		return modelMapper.map(author, AuthorDto.class);
 	}
 
 	@Override
 	public Iterable<BookDto> findBooksByAuthor(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Book> books = bookRepository.findBooksByAuthor(authorName);
+		return books.stream()
+				.map(b -> modelMapper.map(b, BookDto.class))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Iterable<BookDto> findBooksByPublisher(String publisherName) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Book> books = bookRepository.findBooksByPublisher(publisherName);
+		return books.stream()
+				.map(b -> modelMapper.map(b, BookDto.class))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Iterable<AuthorDto> findBookAuthors(String isbn) {
-		// TODO Auto-generated method stub
-		return null;
+		Book book = bookRepository.findById(isbn).orElseThrow(DocumentNotFoundException::new);
+		return book.getAuthors().stream()
+				.map(a -> modelMapper.map(a, AuthorDto.class))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Iterable<String> findPublishersByAuthor(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		return publisherRepository.findPublishersByAuthor(authorName)
+					.stream()
+					.map(p -> p.getPublisherName())
+					.collect(Collectors.toList());
 	}
 
 }
